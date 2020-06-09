@@ -39,7 +39,7 @@
 # Auto removal of BOM files to reduce errors
 # Sleep commands instead of policies or other changes being called
 # Quit Key set to command + control + x
-  TESTING_MODE=true # Set variable to true or false
+  TESTING_MODE=false # Set variable to true or false
 
 #########################################################################################
 # General Appearance
@@ -55,6 +55,9 @@
 # Update the variable below replacing "Organization" with the actual name of your organization. Example "ACME Corp Inc."
   YOUR_ORG_NAME_HERE="Organization"
 
+# Generalised support contact phrase
+  YOUR_ORG_SUPPORT="email support@company.nyc"
+  
 # Main heading that will be displayed under the image
 # If this variable is left blank, the generic banner will appear
   BANNER_TITLE="Welcome to $YOUR_ORG_NAME_HERE"
@@ -70,6 +73,22 @@
 # Text that will display in the progress bar
   INSTALL_COMPLETE_TEXT="Configuration Complete!"
 
+# Apps
+  APPS=(
+    "Create Admin Account,admin"
+    "Installing Latest Slack,install-latest-Slack"
+    "Installing Latest Chrome,install-latest-Chrome"   
+    "Installing Latest Zoom,install-latest-Zoom"
+    "Installing Cylance AV,cylance"    
+    "Removing setup tools and preparing for user,done"  
+  )
+  
+# Cities
+  CITIES=(
+     "NY"
+     "LA"
+  )
+
 # Complete messaging to the end user can ether be a button at the bottom of the
 # app with a modification to the main window text or a dropdown alert box. Default
 # value set to false and will use buttons instead of dropdown messages.
@@ -83,7 +102,7 @@
     FV_COMPLETE_MAIN_TEXT='Your Mac must logout to start the encryption process. You will be asked to enter your password and click OK or Continue a few times. Your Mac will be usable while encryption takes place.'
     FV_COMPLETE_BUTTON_TEXT="Logout"
 
-# Text that will display inside the alert once policies have finished
+# Text that will display inside the alert once policies have finishedc
   # Option for dropdown alert box
     COMPLETE_ALERT_TEXT="Your Mac is now finished with initial setup and configuration. Press Quit to get started!"
   # Options if not using dropdown alert box
@@ -111,7 +130,7 @@
 # Help Button Configuration
   # The help button was changed to a popup. Button will appear if title is populated.
     HELP_BUBBLE_TITLE="Need Help?"
-    HELP_BUBBLE_BODY="This tool at $YOUR_ORG_NAME_HERE is designed to help with new employee onboarding. If you have issues, please give us a call at 123-456-7890"
+    HELP_BUBBLE_BODY="This tool at $YOUR_ORG_NAME_HERE is designed to help with new employee onboarding. If you have issues, please $YOUR_ORG_SUPPORT"
 
 #########################################################################################
 # Error Screen Text
@@ -128,8 +147,9 @@
 # Paragraph text that will display under the main heading. For a new line, use \n
 # If this variable is left blank, the generic message will appear. Leave single
 # quotes below as double quotes will break the new lines.
-  ERROR_MAIN_TEXT='We are sorry that you are experiencing this inconvenience with your new Mac. However, we have the nerds to get you back up and running in no time! \n \n Please contact IT right away and we will take a look at your computer ASAP. \n \n Phone: 123-456-7890'
-
+  ERROR_MAIN_TEXT='We are sorry that you are experiencing this inconvenience with your new Mac. However, we have the nerds to get you back up and running in no time! \n \n Please contact IT right away and we will take a look at your computer ASAP. \n \n'
+  ERROR_MAIN_TEXT="$ERROR_MAIN_TEXT $YOUR_ORG_SUPPORT"
+  
 # Error status message that is displayed under the progress bar
   ERROR_STATUS="Setup Failed"
 
@@ -147,18 +167,7 @@ TRIGGER="event"
 #########################################################################################
 # The policy array must be formatted "Progress Bar text,customTrigger". These will be
 # run in order as they appear below.
-  POLICY_ARRAY=(
-    "Installing Adobe Creative Cloud,adobeCC"
-    "Installing Adobe Reader,adobeReader"
-    "Installing Chrome,chrome"
-    "Installing CrashPlan,crashplan"
-    "Installing Firefox,firefox"
-    "Installing Java,java"
-    "Installing NoMAD,nomad"
-    "Installing Office,msOffice"
-    "Installing Webex,webex"
-    "Installing Critical Updates,updateSoftware"
-  )
+  POLICY_ARRAY=( "${APPS[@]}" )
 
 #########################################################################################
 # Caffeinate / No Sleep Configuration
@@ -181,7 +190,7 @@ TRIGGER="event"
 # Please note, custom branding is downloaded from Jamf Pro after Self Service has opened
 # at least one time. The script is designed to wait until the files have been downloaded.
 # This could take a few minutes depending on server and network resources.
-  SELF_SERVICE_CUSTOM_BRANDING=false # Set variable to true or false
+  SELF_SERVICE_CUSTOM_BRANDING=true # Set variable to true or false
 
 # If using a name other than Self Service with Custom branding. Change the
 # name with the SELF_SERVICE_APP_NAME variable below. Keep .app on the end
@@ -214,11 +223,11 @@ TRIGGER="event"
 # Registration Variables to Modify
 #########################################################################################
 # Registration window configuration
-  REGISTRATION_ENABLED=false # Set variable to true or false
+  REGISTRATION_ENABLED=true # Set variable to true or false
 
   # Registration window title
     REGISTRATION_TITLE="Register Mac at $YOUR_ORG_NAME_HERE"
-    
+
   # Registration status bar text
     REGISTRATION_STATUS="Waiting on completion of computer registration"
 
@@ -240,10 +249,10 @@ TRIGGER="event"
   # First Text Field
   #######################################################################################
     # Text Field Label
-      REG_TEXT_LABEL_1="Computer Name"
+      REG_TEXT_LABEL_1="Your Name"
 
     # Place Holder Text
-      REG_TEXT_LABEL_1_PLACEHOLDER="macBook0123"
+      REG_TEXT_LABEL_1_PLACEHOLDER="Steve Jobs"
 
     # Optional flag for making the field an optional input for end user
       REG_TEXT_LABEL_1_OPTIONAL="false" # Set variable to true or false
@@ -266,7 +275,7 @@ TRIGGER="event"
           if [ "$TESTING_MODE" = true ]; then
             sleep 10
           else
-            "$JAMF_BINARY" setComputerName -name "$REG_TEXT_LABEL_1_VALUE"
+            #"$JAMF_BINARY" setComputerName -name "$REG_TEXT_LABEL_1_VALUE"
             sleep 5
           fi
         fi
@@ -275,7 +284,7 @@ TRIGGER="event"
   # Second Text Field
   #######################################################################################
     # Text Field Label
-      REG_TEXT_LABEL_2="Asset Tag"
+      REG_TEXT_LABEL_2="" #no label == nulled
 
     # Place Holder Text
       REG_TEXT_LABEL_2_PLACEHOLDER="81926392"
@@ -312,11 +321,7 @@ TRIGGER="event"
       REG_POPUP_LABEL_1="Building"
 
     # Array of options for the user to select
-      REG_POPUP_LABEL_1_OPTIONS=(
-        "Amsterdam"
-        "Eau Claire"
-        "Minneapolis"
-      )
+      REG_POPUP_LABEL_1_OPTIONS=( "${CITIES[@]}" )
 
     # Help Bubble for Input. If title left blank, this will not appear
       REG_POPUP_LABEL_1_HELP_TITLE="Building Dropdown Field"
@@ -332,13 +337,14 @@ TRIGGER="event"
            sleep 10
         else
           "$JAMF_BINARY" recon -building "$REG_POPUP_LABEL_1_VALUE"
+          RENAME_COMPUTER #now you have enough info to call this function          
         fi
       }
 
   # Popup 2
   #######################################################################################
     # Label for the popup
-      REG_POPUP_LABEL_2="Department"
+      REG_POPUP_LABEL_2="" #was Department blank == nulled
 
     # Array of options for the user to select
       REG_POPUP_LABEL_2_OPTIONS=(
@@ -364,32 +370,37 @@ TRIGGER="event"
         fi
       }
 
-  # Popup 3 - Code is here but currently unused
+    # Popup 3
   #######################################################################################
     # Label for the popup
-      REG_POPUP_LABEL_3=""
+      REG_POPUP_LABEL_3="Do you want to create end-user account based on the name you provided?"
 
     # Array of options for the user to select
       REG_POPUP_LABEL_3_OPTIONS=(
-        "Option 1"
-        "Option 2"
-        "Option 3"
+        "Yes"
+        "No"
+        
       )
 
     # Help Bubble for Input. If title left blank, this will not appear
-      REG_POPUP_LABEL_3_HELP_TITLE="Dropdown 3 Field"
-      REG_POPUP_LABEL_3_HELP_TEXT="This dropdown is currently not in use. All code is here ready for you to use. It can also be hidden by removing the contents of the REG_POPUP_LABEL_3 variable."
+      REG_POPUP_LABEL_3_HELP_TITLE="Create local user. Default password will be: ChangemeASAP."
+      REG_POPUP_LABEL_3_HELP_TEXT="Pick if you want to create a local accout. Default password will be: ChangemeASAP"
 
     # Logic below was put in this section rather than in core code as folks may
     # want to change what the field does. This is a function that gets called
     # when needed later on. BE VERY CAREFUL IN CHANGING THE FUNCTION!
       REG_POPUP_LABEL_3_LOGIC (){
         REG_POPUP_LABEL_3_VALUE=$(defaults read "$DEP_NOTIFY_USER_INPUT_PLIST" "$REG_POPUP_LABEL_3")
-        echo "Status: $REGISTRATION_BEGIN_WORD $REG_POPUP_LABEL_3 $REGISTRATION_MIDDLE_WORD $REG_POPUP_LABEL_3_VALUE" >> "$DEP_NOTIFY_LOG"
-        if [ "$TESTING_MODE" = true ]; then
-          sleep 10
+        
+        if [ "$REG_POPUP_LABEL_3_VALUE" = "Yes" ]; then
+          		sleep 3
+				CREATE_END_USER
+                  #REG_TEXT_LABEL_1_VALUE=$(defaults read "$DEP_NOTIFY_USER_INPUT_PLIST" "$REG_TEXT_LABEL_1")
         else
-          sleep 10
+          echo "No local user account created"
+          echo "Status: You picked to skip user account creation" >> "$DEP_NOTIFY_LOG"
+    	  sleep 1
+    
         fi
       }
 
@@ -421,6 +432,86 @@ TRIGGER="event"
           sleep 10
         fi
       }
+      
+      
+  #######################################################################################
+#Create End User
+  #######################################################################################
+CREATE_END_USER () {
+  #REG_TEXT_LABEL_1_VALUE=$(defaults read "$DEP_NOTIFY_USER_INPUT_PLIST" "$REG_TEXT_LABEL_1")
+  echo "Status: Local user $REG_TEXT_LABEL_1_VALUE is being created with password: ChangemeASAP " >> "$DEP_NOTIFY_LOG"	
+
+  USER=$(echo $REG_TEXT_LABEL_1_VALUE |awk -F'@' '{print $1}')
+  /usr/sbin/sysadminctl -addUser $USER -fullName "$REG_TEXT_LABEL_1_VALUE" -password "ChangemeASAP"
+}
+  
+  #######################################################################################
+#Rename Mac
+  #######################################################################################
+RENAME_COMPUTER (){
+  REG_TEXT_LABEL_1_VALUE=$(defaults read "$DEP_NOTIFY_USER_INPUT_PLIST" "$REG_TEXT_LABEL_1")
+
+  product_name=$(ioreg -l | awk '/product-name/ { split($0, line, "\""); printf("%s\n", line[4]); }')
+  CITY="$REG_POPUP_LABEL_1_VALUE"
+  USER=$(echo $REG_TEXT_LABEL_1_VALUE |awk -F'@' '{print $1}')
+
+  if echo "$product_name" | grep -q "MacBookAir*"
+  then
+      MAC="MBA"
+
+  elif echo "$product_name" | grep -q "MacBookPro*"
+  then
+      MAC="MBP"
+
+  elif echo "$product_name" | grep -q "iMac*"
+  then
+      MAC="iMAC"
+
+  elif echo "$product_name" | grep -q "MacBook"
+  then
+      MAC="MB"
+
+  elif echo "$product_name" | grep -q "Parallels*"
+  then
+      MAC="VM"
+
+  elif echo "$product_name" | grep -q "Vmware*"
+  then
+      MAC="VM"
+
+  else
+      echo "No model identifier found."
+      MAC=""
+
+      if [ "$MAC" == "" ]; then
+      echo "Error: No model identifier found."
+      fi
+
+  fi
+
+  #curl apples machine db against last 4 of serial
+  #get last four serial for year
+  echo -e "GET http://google.com HTTP/1.0\n\n" | nc google.com 80 > /dev/null 2>&1
+  if [ $? -eq 0 ]; then
+      lastFourSerialForAPPL=$(system_profiler SPHardwareDataType | awk '/Serial/ {print $4}' | grep -o '....$')
+      echo "last four is" $lastFourSerialForAPPL
+      #use that (serial) for actual year
+      MNF_YEAR=$(curl "https://support-sp.apple.com/sp/product?cc=`echo $lastFourSerialForAPPL`" |grep -Eo '[0-9]{4}')
+  else
+      echo "Offline"
+      MNF_YEAR="DEP"
+  fi
+  computer_name="$CITY-$MNF_YEAR-$MAC-$USER"
+  # do all the things
+  if [ -z "$computer_name" ]
+  then
+  echo "Please set \$computer_name"
+  else
+  $JAMF_BINARY setComputerName -name "$computer_name"
+  echo "Status: Computername $computer_name is being set. " >> "$DEP_NOTIFY_LOG"	
+  fi
+}
+
 
 #########################################################################################
 #########################################################################################
