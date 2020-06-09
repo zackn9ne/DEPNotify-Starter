@@ -259,25 +259,23 @@ TRIGGER="event"
 
     # Help Bubble for Input. If title left blank, this will not appear
       REG_TEXT_LABEL_1_HELP_TITLE="Computer Name Field"
-      REG_TEXT_LABEL_1_HELP_TEXT="This field is sets the name of your new Mac to what is in the Computer Name box. This is important for inventory purposes."
+      REG_TEXT_LABEL_1_HELP_TEXT="This field ties your name to the hardware you have received for inventory purposes."
 
     # Logic below was put in this section rather than in core code as folks may
     # want to change what the field does. This is a function that gets called
     # when needed later on. BE VERY CAREFUL IN CHANGING THE FUNCTION!
       REG_TEXT_LABEL_1_LOGIC (){
         REG_TEXT_LABEL_1_VALUE=$(defaults read "$DEP_NOTIFY_USER_INPUT_PLIST" "$REG_TEXT_LABEL_1")
+	#if marked optional
         if [ "$REG_TEXT_LABEL_1_OPTIONAL" = true ] && [ "$REG_TEXT_LABEL_1_VALUE" = "" ]; then
           echo "Status: $REG_TEXT_LABEL_1 was left empty. Skipping..." >> "$DEP_NOTIFY_LOG"
           echo "$(date "+%a %h %d %H:%M:%S"): $REG_TEXT_LABEL_1 was set to optional and was left empty. Skipping..." >> "$DEP_NOTIFY_DEBUG"
           sleep 5
+	#if mandatory
         else
-          echo "Status: $REGISTRATION_BEGIN_WORD $REG_TEXT_LABEL_1 $REGISTRATION_MIDDLE_WORD $REG_TEXT_LABEL_1_VALUE" >> "$DEP_NOTIFY_LOG"
+          echo "Status: Welcome to your new Mac, $REG_TEXT_LABEL_1 $REGISTRATION_MIDDLE_WORD $REG_TEXT_LABEL_1_VALUE" >> "$DEP_NOTIFY_LOG"
           if [ "$TESTING_MODE" = true ]; then
             sleep 10
-          else
-            #"$JAMF_BINARY" setComputerName -name "$REG_TEXT_LABEL_1_VALUE"
-            sleep 5
-          fi
         fi
       }
 
@@ -336,7 +334,10 @@ TRIGGER="event"
         if [ "$TESTING_MODE" = true ]; then
            sleep 10
         else
+	  echo "Status: Recording your choice of: $REG_POPUP_LABEL_1_VALUE back to our servers." >> "$DEP_NOTIFY_LOG"
           "$JAMF_BINARY" recon -building "$REG_POPUP_LABEL_1_VALUE"
+	  sleep 10
+	  echo "Status: Now we have enough info to rename your computer for ease of support staff." >> "$DEP_NOTIFY_LOG"	  
           RENAME_COMPUTER #now you have enough info to call this function          
         fi
       }
@@ -393,12 +394,11 @@ TRIGGER="event"
         REG_POPUP_LABEL_3_VALUE=$(defaults read "$DEP_NOTIFY_USER_INPUT_PLIST" "$REG_POPUP_LABEL_3")
         
         if [ "$REG_POPUP_LABEL_3_VALUE" = "Yes" ]; then
-          		sleep 3
-				CREATE_END_USER
-                  #REG_TEXT_LABEL_1_VALUE=$(defaults read "$DEP_NOTIFY_USER_INPUT_PLIST" "$REG_TEXT_LABEL_1")
+          sleep 5
+	  CREATE_END_USER
+        #REG_TEXT_LABEL_1_VALUE=$(defaults read "$DEP_NOTIFY_USER_INPUT_PLIST" "$REG_TEXT_LABEL_1")
         else
-          echo "No local user account created"
-          echo "Status: You picked to skip user account creation" >> "$DEP_NOTIFY_LOG"
+          echo "Status: You picked to skip personal account creation, you may wan't to rethink that." >> "$DEP_NOTIFY_LOG"
     	  sleep 1
     
         fi
@@ -435,7 +435,7 @@ TRIGGER="event"
       
       
   #######################################################################################
-#Create End User
+#Create End User Extra Function
   #######################################################################################
 CREATE_END_USER () {
   #REG_TEXT_LABEL_1_VALUE=$(defaults read "$DEP_NOTIFY_USER_INPUT_PLIST" "$REG_TEXT_LABEL_1")
@@ -446,10 +446,11 @@ CREATE_END_USER () {
 }
   
   #######################################################################################
-#Rename Mac
+#Rename Mac Extra Function
   #######################################################################################
 RENAME_COMPUTER (){
-  REG_TEXT_LABEL_1_VALUE=$(defaults read "$DEP_NOTIFY_USER_INPUT_PLIST" "$REG_TEXT_LABEL_1")
+  #shuffle variable into here ?
+  #REG_TEXT_LABEL_1_VALUE=$(defaults read "$DEP_NOTIFY_USER_INPUT_PLIST" "$REG_TEXT_LABEL_1")
 
   product_name=$(ioreg -l | awk '/product-name/ { split($0, line, "\""); printf("%s\n", line[4]); }')
   CITY="$REG_POPUP_LABEL_1_VALUE"
