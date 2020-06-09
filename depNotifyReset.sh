@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Must be run in sudo
+  pkill -i Depnotify
 
 # Removing config files in /var/tmp
   rm /var/tmp/depnotify*
